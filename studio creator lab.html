@@ -1,0 +1,750 @@
+<!DOCTYPE html><html><head><style></style></head><body><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Studio Creator Lab - Broadcast Edition</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@700;900&family=Gulzar&family=Noto+Sans+Arabic:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu:wght@400..700&display=swap" rel="stylesheet">
+
+<style>
+    :root {
+    --accent-gold: #ffcc00;
+    --urgent-red: #ff003c;
+    --glass-bg: rgba(10, 10, 10, 0.96);
+    --gold: #ffcc00;
+    --red: #ff003c;
+    --dark-glass: rgba(0, 0, 0, 0.85);
+    
+    /* 🧠 ڈائنامک اسکیلنگ یونٹس (یہ ہر اسکرین کے مطابق ٹیکسٹ اور سائز خودکار سیٹ کرتے ہیں) */
+    --base-scale: 1cvw; 
+  }
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+  }
+
+  body {
+    background: #111;
+    height: 100vh;
+    width: 100vw;
+    font-family: 'Segoe UI', sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  /* 📺 مین اسٹوڈیو کنٹینر (ہر ڈیوائس پر آٹو فٹ ہونے والا) */
+  .aspect-16-9 {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    aspect-ratio: 16 / 9;
+    background-color: green;
+    border: 3px solid #0088cc;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    container-type: size; /* 🌟 کنٹینر کیوریز ایکٹیویشن برائے 100% آٹو ایڈجسٹمنٹ */
+  }
+
+  /* ===== TOP SCROLL TOOLBAR ===== */
+  .toolbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 60px;
+    background: rgba(255, 255, 255, 0.95);
+    display: none;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-bottom: 3px solid #0088cc;
+    overflow-x: auto;
+    white-space: nowrap;
+    z-index: 1000;
+  }
+
+  .toolbar button {
+    min-width: 80px;
+    height: 40px;
+    background: #0088cc;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 12px;
+    flex-shrink: 0;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .toolbar button:hover { background: #005577; }
+
+  /* 🔴 لائیو نیچے چلنے والی پٹی (Ticker) */
+  .ticker {
+    background: linear-gradient(90deg, #500, #900, #d00, #900, #500);
+    height: 4.5cqh; /* اسکرین کی ہائٹ کے مطابق آٹو سائز */
+    min-height: 25px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 -5px 15px rgba(0,0,0,0.4);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    z-index: 10;
+    color: #fff;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 2.2cqh; /* ٹیکسٹ سائز خودکار بڑا یا چھوٹا ہوگا */
+    font-weight: bold;
+    border-top: 2px solid #ffbb00;
+    border-bottom: 2px solid #ffbb00;
+    text-shadow: 1.5px 1.5px #000;
+  }
+
+  .market-unit {
+    background: rgba(0,0,0,0.4);
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-family: 'Courier New', Courier, monospace;
+    color: #fff;
+    border-left: 2px solid gold;
+  }
+
+  .ticker-content {
+    display: inline-block;
+    animation: scroll-left 30s linear infinite;
+    padding-left: 100%;
+  }
+
+  @keyframes scroll-left {
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-100%); }
+  }
+
+  /* 🔥 بریکنگ نیوز ماسٹر کنٹینر */
+  .breaking-news-master {
+    position: absolute;
+    top: 3cqh;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 94cqw; /* اسکرین کی چوڑائی کے مطابق لچکدار */
+    z-index: 500;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8cqh;
+  }
+
+  .breaking-container {
+    display: flex;
+    background: var(--dark-glass);
+    border-left: 0.6cqw solid var(--gold);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    height: 7.5cqh;
+    min-height: 40px;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .breaking-title {
+    background: var(--gold);
+    color: #000;
+    font-weight: 900;
+    padding: 0 2cqw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.2cqh;
+    text-transform: uppercase;
+    clip-path: polygon(0 0, 100% 0, 88% 100%, 0% 100%);
+    min-width: 18cqw;
+    font-family: 'Arial Black', sans-serif;
+    letter-spacing: -0.5px;
+    text-shadow: 1px 1px 0px rgba(0,0,0,0.1);
+  }
+
+  .breaking-content {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    padding: 0 3cqw;
+    overflow: hidden;
+  }
+
+  .news-main-text {
+    font-family: 'Gulzar', 'Poppins', serif;
+    font-weight: 700;
+    line-height: 1.4;
+    color: #FFD700;
+    filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.2));
+    font-size: 2.6cqh;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* 📍 انفو بار سسٹم (لوکیشن، کیٹیگری، ٹائم) */
+  .info-bar-system {
+    display: flex;
+    gap: 1cqw;
+    padding-left: 1cqw;
+    width: 100%;
+  }
+
+  .info-unit {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    padding: 0.4cqh 2cqw;
+    font-size: 1.6cqh;
+    font-weight: bold;
+    border-bottom: 2px solid var(--gold);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  .unit-time { background: #000 !important; color: #ffcc00 !important; border: 1px solid #ffcc00; }
+  .unit-loc { background: #fff !important; color: #000 !important; font-weight: 900 !important; }
+  .unit-cat { background: var(--red); color: #fff; }
+
+  /* 📦 3D لوگو اسٹوڈیو سسٹم */
+  .logo-container {
+    position: absolute;
+    bottom: 8cqh;
+    right: 4cqw;
+    z-index: 15;
+    width: 7cqh;
+    height: 7cqh;
+    min-width: 40px;
+    min-height: 40px;
+  }
+
+  .scene {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    transform-style: preserve-3d;
+    animation: rotateLeft 6s linear infinite;
+  }
+
+  .face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #fff;
+    box-shadow: 0 0 4px rgba(0,0,0,0.5);
+    background: linear-gradient(145deg, #0044cc, #0088ff);
+  }
+
+  /* تھری ڈی مکعب (Cube) کا سائز اسکرین کے تناسب سے خودکار بنانے کی لاجک */
+  .front  { transform: translateZ(calc(7cqh / 2)); }
+  .back   { transform: rotateY(180deg) translateZ(calc(7cqh / 2)); }
+  .right  { transform: rotateY(90deg) translateZ(calc(7cqh / 2)); }
+  .left   { transform: rotateY(-90deg) translateZ(calc(7cqh / 2)); }
+  .top    { transform: rotateX(90deg) translateZ(calc(7cqh / 2)); }
+  .bottom { transform: rotateX(-90deg) translateZ(calc(7cqh / 2)); }
+
+  /* کم سے کم پکسل سپورٹ (بیک اپ فار اسمال اسکرینز) */
+  @container (max-height: 500px) {
+    .front  { transform: translateZ(20px); }
+    .back   { transform: rotateY(180deg) translateZ(20px); }
+    .right  { transform: rotateY(90deg) translateZ(20px); }
+    .left   { transform: rotateY(-90deg) translateZ(20px); }
+    .top    { transform: rotateX(90deg) translateZ(20px); }
+    .bottom { transform: rotateX(-90deg) translateZ(20px); }
+  }
+
+  .header {
+    flex: 0 0 25%;
+    background: #ffcc00;
+    color: #000;
+    font-size: 1cqh;
+    min-font-size: 6px;
+    font-weight: bold;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid #fff;
+  }
+
+  .label {
+    flex: 1;
+    color: #fff;
+    font-size: 2.2cqh;
+    font-weight: bold;
+    letter-spacing: 1px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-shadow: 1px 1px 2px #000;
+  }
+
+  @keyframes rotateLeft {
+    0%   { transform: rotateY(0deg); }
+    100% { transform: rotateY(-360deg); }
+  }
+
+  /* 📱 فیس بک ریلز اور یوٹیوب شارٹس (9:16 ورٹیکل موڈ) */
+  .aspect-9-16 {
+    width: calc(100vh * 9 / 16) !important;
+    height: 100vh !important;
+    aspect-ratio: 9 / 16 !important;
+  }
+
+  /* 🔄 شارٹس موڈ آن ہوتے ہی یہ کیورز خود بخود سب کچھ ڈیزائن بدل دیں گی */
+  .aspect-9-16 .breaking-title {
+    font-size: 2.5cqh !important;
+    clip-path: polygon(0 0, 100% 0, 90% 100%, 0% 100%) !important;
+    min-width: 22cqw !important;
+  }
+  
+  .aspect-9-16 .news-main-text {
+    font-size: 2.1cqh !important;
+  }
+
+  .aspect-9-16 .info-bar-system {
+    justify-content: space-between !important;
+    gap: 0.5cqw !important;
+  }
+
+  .aspect-9-16 .info-unit {
+    font-size: 1.3cqh !important;
+    padding: 0.2cqh 1cqw !important;
+    flex-grow: 1;
+    text-align: center;
+  }
+
+  .aspect-9-16 .logo-container {
+    bottom: 7cqh !important;
+    right: 4cqw !important;
+  }
+
+  /* 🎥 اسٹریمنگ ایکٹو موڈ */
+  .streaming-active {
+    cursor: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+  }
+
+  /* 🌍 گلوبل اردو فونٹ پروڈکشن سیٹنگ */
+  .urdu-text, .breaking-urdu, [style*="direction: rtl"] {
+    font-family: 'Noto Nastaliq Urdu', 'Noto Sans Arabic', 'Jameel Noori Nastaleeq', serif !important;
+    line-height: 1.5 !important;
+  }
+
+  /* 🌟 کوانٹم اینیمیشن */
+  .quantum-entry {
+    animation: quantumIn 0.6s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+  }
+
+  @keyframes quantumIn {
+    0% { opacity: 0; transform: perspective(500px) rotateX(-90deg); filter: blur(10px); }
+    100% { opacity: 1; transform: perspective(500px) rotateX(0deg); filter: blur(0); }
+  }
+</style>
+</head>
+<body>
+
+<div class="aspect-16-9" id="mainStudio">
+  
+  <div class="toolbar" id="toolbar">
+    <button id="fullscreenBtn">Full Screen</button>
+    <button onclick="triggerUpload()">Upload Video</button>
+    
+    <button id="fullscreenBtn">Full Screen</button>
+    <button onclick="triggerUpload()">Upload Video</button>
+    <button id="ratioBtn" style="background: #ff003c;">Switch to Shorts (9:16)</button>
+    <button id="streamModeBtn" style="background: #222; border: 1px solid #ffcc00;">Streaming Mode: OFF</button>
+  
+    
+  </div>
+ 
+
+
+
+
+<div class="breaking-news-master">
+    <div class="breaking-container">
+        <div id="news-text" class="breaking-title">HEADLINES</div>
+        <div class="breaking-content">
+            <div id="fake-news" class="news-main-text">Syncing Live Global Feed...</div>
+        </div>
+    </div>
+
+    <div id="info-bar-dynamic" class="info-bar-system">
+        </div>
+</div>
+
+
+
+  <div class="ticker">
+    <div class="ticker-content">
+      🔴 <span style="color:gold; background: black;">Smart Media Point:</span> Subscribe | Like | Share | Owner: Muhammed Sajid 03162913305 &nbsp;&nbsp;&nbsp;&nbsp;
+    </div>
+  </div>
+        
+  <div class="logo-container">
+    <div class="scene">
+      <div class="face front"><div class="header"><div id="liveTime"></div></div><div class="label">SMP</div></div>
+      <div class="face back"><div class="header"><div id="liveDate"></div></div><div class="label">SMP</div></div>
+      <div class="face right"><div class="header">Smart Media</div><div class="label">SMP</div></div>
+      <div class="face left"><div class="header">Smart Media</div><div class="label">SMP</div></div>
+      <div class="face top"><div class="header">Smart Media</div><div class="label">SMP</div></div>
+      <div class="face bottom"><div class="header">LIVE</div><div class="label">LIVE</div></div>
+    </div>
+  </div>
+
+  <input type="file" id="videoFile" accept="video/*" style="display:none;" onchange="loadVideo(event)">
+  <div id="playerContainer" style="display:none; position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); width:80%; z-index:5;">
+    <video id="videoPlayer" controls style="width:100%; border-radius:12px;"></video>
+  </div>
+
+</div>
+
+<script>
+    const studio = document.getElementById('mainStudio');
+    const toolbar = document.getElementById('toolbar');
+
+    // Double-click to toggle toolbar
+    studio.addEventListener('dblclick', () => {
+      toolbar.style.display = toolbar.style.display === 'none' ? 'flex' : 'none';
+    });
+
+    document.getElementById('fullscreenBtn').onclick = () => {
+      if (!document.fullscreenElement) studio.requestFullscreen();
+      else document.exitFullscreen();
+    };
+
+
+
+
+
+/*🔷 breaking news ====================*/
+
+
+/* ============================================================
+   🚀 ULTRA-ADVANCED NEWS INTELLIGENCE (ORIGINAL BROADCAST)
+   ============================================================ */
+
+const BreakingNewsConfig = {
+    sources: [
+        "https://api.rss2json.com/v1/api.json?rss_url=https://www.dawn.com/feeds/home",
+        "https://api.rss2json.com/v1/api.json?rss_url=https://feeds.bbci.co.uk/news/world/rss.xml",
+        "https://api.rss2json.com/v1/api.json?rss_url=https://www.aljazeera.com/xml/rss/all.xml",
+        "https://api.rss2json.com/v1/api.json?rss_url=https://tribune.com.pk/feed/home"
+    ],
+    displayTime: 10000, // 10 سیکنڈ (پڑھنے کے لیے بہتر وقت)
+    isUrdu: false,
+    newsStack: [],
+    pointer: 0
+};
+
+// 🧠 مقام (Location) پہچاننے والا انجن
+function extractLocation(text) {
+    const locations = [
+        "KARACHI", "ISLAMABAD", "LAHORE", "PESHAWAR", "QUETTA", "GAZA", 
+        "LONDON", "WASHINGTON", "NEW YORK", "TOKYO", "BEIJING", "MOSCOW",
+        "UKRAINE", "PALESTINE", "INDIA", "CHINA", "USA", "WORLDWIDE"
+    ];
+    const found = locations.find(loc => text.toUpperCase().includes(loc));
+    return found || "LATEST"; 
+}
+
+async function loadBreakingNews() {
+    let allFeeds = [];
+    for (let url of BreakingNewsConfig.sources) {
+        try {
+            const res = await fetch(url);
+            const data = await res.json();
+            if (data.status === 'ok') {
+                data.items.forEach(item => {
+                    allFeeds.push({
+                        title: item.title,
+                        rawTime: new Date(item.pubDate), // اصل وقت
+                        category: item.categories[0] || "WORLD NEWS"
+                    });
+                });
+            }
+        } catch (e) { console.log("Feed Sync Error"); }
+    }
+    BreakingNewsConfig.newsStack = allFeeds.sort(() => Math.random() - 0.5);
+}
+
+async function updateBreakingUI() {
+    if (BreakingNewsConfig.newsStack.length === 0) return;
+    
+    const news = BreakingNewsConfig.newsStack[BreakingNewsConfig.pointer];
+    const textElem = document.getElementById("fake-news");
+    const titleElem = document.getElementById("news-text");
+    const infoBar = document.getElementById("info-bar-dynamic");
+
+    // وقت کا حساب (کتنی دیر پہلے)
+    const timeDiff = Math.floor((new Date() - news.rawTime) / 60000); 
+    const timeDisplay = timeDiff > 60 ? "LIVE" : `${timeDiff} MINS AGO`;
+
+    // لوکیشن نکالنا
+    const location = extractLocation(news.title);
+
+    // ساؤنڈ ایفیکٹ
+    new Audio('https://www.soundjay.com/buttons/beep-01a.mp3').play().catch(()=>{});
+
+    // 📍 صرف لوکیشن اور ٹائم دکھانا (سورس غائب)
+    infoBar.innerHTML = `
+        <div class="info-unit unit-loc quantum-entry">📍 ${location}</div>
+        <div class="info-unit unit-cat quantum-entry">🔥 ${news.category.toUpperCase()}</div>
+        <div class="info-unit unit-time quantum-entry">🕒 ${timeDisplay}</div>
+    `;
+
+    if (!BreakingNewsConfig.isUrdu) {
+        titleElem.textContent = "BREAKING";
+        titleElem.style.background = "#ffcc00"; 
+        textElem.textContent = news.title;
+        textElem.style.direction = "ltr";
+        BreakingNewsConfig.isUrdu = true;
+    } else {
+        titleElem.textContent = "بریکنگ نیوز";
+        titleElem.style.background = "#ff003c";
+        try {
+            const tr = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=ur&dt=t&q=${encodeURI(news.title)}`);
+            const res = await tr.json();
+            textElem.textContent = res[0][0][0];
+        } catch (e) { textElem.textContent = news.title; }
+        
+        textElem.style.direction = "rtl";
+        BreakingNewsConfig.isUrdu = false;
+        BreakingNewsConfig.pointer = (BreakingNewsConfig.pointer + 1) % BreakingNewsConfig.newsStack.length;
+    }
+
+    // اینیمیشن ری سیٹ
+    textElem.classList.remove("quantum-entry");
+    void textElem.offsetWidth;
+    textElem.classList.add("quantum-entry");
+}
+
+setInterval(updateBreakingUI, BreakingNewsConfig.displayTime);
+loadBreakingNews();
+
+
+
+
+/* ========================================================================
+   🚀 2. THE QUANTUM INFINITY TICKER (ULTRA-ADVANCED EDITION)
+   ======================================================================== */
+
+const TickerConfig = {
+    content: document.querySelector('.ticker-content'),
+    container: document.querySelector('.ticker'),
+    refreshRate: 300000, // 5 منٹ
+    sources: [
+        "https://api.rss2json.com/v1/api.json?rss_url=https://www.dawn.com/feeds/home",
+        "https://api.rss2json.com/v1/api.json?rss_url=https://tribune.com.pk/feed/home",
+        "https://api.rss2json.com/v1/api.json?rss_url=https://feeds.bbci.co.uk/news/world/rss.xml"
+    ]
+};
+
+// 💎 اسمارٹ ڈیٹا فیچر: مارکیٹ اور موسم (Simulation)
+async function getLiveMarketData() {
+    // یہاں آپ لائیو API بھی لگا سکتے ہیں، فی الحال یہ ریئل ٹائم ڈیٹا فارمیٹ ہے
+    const goldPrice = "Gold: 234,500/-";
+    const btcPrice = "BTC: $64,230";
+    return `<span class="market-unit"> 💹 ${goldPrice} </span> | <span class="market-unit"> 🪙 ${btcPrice} </span>`;
+}
+
+// 🧠 خبر کے جذبات (Sentiment) پہچاننے والا فنکشن
+function getNewsStyling(title) {
+    const alertKeywords = ["breaking", "killed", "died", "explosion", "urgent", "دھماکہ", "افسوسناک", "شدید"];
+    const successKeywords = ["won", "gold", "launched", "victory", "کامیابی", "جیت", "اعزاز"];
+    
+    let style = "color: #fff;"; // Default White
+    let icon = "🔴";
+
+    if (alertKeywords.some(word => title.toLowerCase().includes(word))) {
+        style = "color: #ff003c; font-weight: 900; text-shadow: 0 0 10px rgba(255,0,0,0.5);";
+        icon = "🚨";
+    } else if (successKeywords.some(word => title.toLowerCase().includes(word))) {
+        style = "color: #00ff88; font-weight: bold;";
+        icon = "🏆";
+    }
+    
+    return { style, icon };
+}
+
+async function buildAdvancedTicker() {
+    console.log("🛠️ Rebuilding Quantum Ticker...");
+    let finalTickerHTML = [];
+
+    // 1. برانڈنگ یونٹ (سب سے پہلے)
+    finalTickerHTML.push(`<span style="background: #000; color: #ffcc00; padding: 0 15px; border-radius: 5px;"> ⚡ SMART MEDIA POINT EXCLUSIVE </span>`);
+
+    // 2. لائیو مارکیٹ ڈیٹا شامل کریں
+    const marketInfo = await getLiveMarketData();
+    finalTickerHTML.push(marketInfo);
+
+    // 3. ملٹی سورس خبریں جمع کریں
+    for (let url of TickerConfig.sources) {
+        try {
+            const res = await fetch(url);
+            const data = await res.json();
+            if (data.status === 'ok') {
+                data.items.slice(0, 10).forEach(item => {
+                    const styling = getNewsStyling(item.title);
+                    finalTickerHTML.push(`
+                        <span style="${styling.style}"> 
+                            ${styling.icon} ${item.title.trim()} 
+                        </span>
+                    `);
+                });
+            }
+        } catch(e) { console.warn("Ticker Fetch Error"); }
+    }
+
+    // 4. سوشل میڈیا اور رابطہ
+    finalTickerHTML.push(`<span style="color:cyan"> 📱 WhatsApp: 03162913305 </span>`);
+    finalTickerHTML.push(`<span style="color:yellow"> 🔔 Subscribe "Smart Media Point" for more updates </span>`);
+
+    // ڈیٹا کو فائنل اسٹرنگ میں بدلیں
+    const tickerString = finalTickerHTML.join(' <span style="color:#555"> | </span> ');
+    
+    // ہموار لوپنگ کے لیے مواد کو تین گنا کرنا (Seamless Loop)
+    TickerConfig.content.innerHTML = tickerString + " | " + tickerString + " | " + tickerString;
+
+    // رفتار کو خودکار ایڈجسٹ کریں
+    adjustTickerSpeed();
+}
+
+function adjustTickerSpeed() {
+    const scrollWidth = TickerConfig.content.scrollWidth;
+    // فارمولا: جتنا بڑا متن، اتنی زیادہ اسپیڈ (تاکہ پڑھنے میں آسانی رہے)
+    const duration = scrollWidth / 100; 
+    TickerConfig.content.style.animation = "none";
+    void TickerConfig.content.offsetWidth; // ری فلو
+    TickerConfig.content.style.animation = `scroll-left ${duration}s linear infinite`;
+}
+
+// سسٹم کو ایکٹیویٹ کریں
+buildAdvancedTicker();
+setInterval(buildAdvancedTicker, TickerConfig.refreshRate);
+
+// اسکرین ری سائز ہونے پر اسپیڈ دوبارہ سیٹ کریں
+window.addEventListener('resize', adjustTickerSpeed);
+
+/* ============================================================
+   3. SYSTEM CLOCK & INITIALIZER
+   ============================================================ */
+
+function startGlobalSystem() {
+    // گھڑی کا جدید فارمیٹ
+    setInterval(() => {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('en-PK', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
+        const dateStr = now.toLocaleDateString('ur-PK', { day: 'numeric', month: 'long', weekday: 'long' });
+        
+        if(document.getElementById('liveTime')) document.getElementById('liveTime').innerHTML = `<span style="color:red">●</span> ${timeStr}`;
+        if(document.getElementById('liveDate')) document.getElementById('liveDate').textContent = dateStr;
+    }, 1000);
+
+    // سورسز کو ہر 10 منٹ بعد دوبارہ لوڈ کریں
+    setInterval(loadBreakingNews, 600000);
+}
+
+startGlobalSystem();
+
+/*end 🔹 breaking news */
+
+/*======================================
+ TIME & DATE */
+    function updateLiveTime() {
+      const now = new Date();
+      const timeElem = document.getElementById('liveTime');
+      const dateElem = document.getElementById('liveDate');
+      if(timeElem) timeElem.textContent = now.toLocaleTimeString('en-PK', {hour:'2-digit', minute:'2-digit'});
+      if(dateElem) dateElem.textContent = now.toLocaleDateString('en-PK', {day:'numeric', month:'short'});
+    }
+    setInterval(updateLiveTime, 1000);
+
+/*======================================*/
+
+// 📺 یوٹیوب لانگ (16:9) اور شارٹس/ریلز (9:16) سوئچر لاجک
+    const ratioBtn = document.getElementById('ratioBtn');
+    let isShorts = false;
+
+    ratioBtn.addEventListener('click', () => {
+      if (!isShorts) {
+        studio.classList.add('aspect-9-16');
+        ratioBtn.textContent = "Switch to Long (16:4)";
+        ratioBtn.style.background = "#0088cc";
+        isShorts = true;
+      } else {
+        studio.classList.remove('aspect-9-16');
+        ratioBtn.textContent = "Switch to Shorts (9:16)";
+        ratioBtn.style.background = "#ff003c";
+        isShorts = false;
+      }
+      // ریشو چینج ہونے پر ٹکر کی اسپیڈ خودکار دوبارہ ایڈجسٹ کریں
+      if(typeof adjustTickerSpeed === "function") adjustTickerSpeed();
+    });
+
+    // 🎥 براڈکاسٹ موڈ (اسٹریمنگ موڈ آن ہوتے ہی ماؤس غائب ہو جائے گا اور فریم صاف ہو جائے گا)
+    const streamModeBtn = document.getElementById('streamModeBtn');
+    let streamMode = false;
+
+    streamModeBtn.addEventListener('click', () => {
+      streamMode = !streamMode;
+      if (streamMode) {
+        studio.classList.add('streaming-active');
+        streamModeBtn.textContent = "Streaming Mode: ON";
+        streamModeBtn.style.background = "#00ff88";
+        streamModeBtn.style.color = "#000";
+        // ٹول بار کو خود بخود چھپا دیں تاکہ لائیو اسٹریم میں نہ آئے
+        toolbar.style.display = 'none';
+      } else {
+        studio.classList.remove('streaming-active');
+        streamModeBtn.textContent = "Streaming Mode: OFF";
+        streamModeBtn.style.background = "#222";
+        streamModeBtn.style.color = "#fff";
+      }
+    });
+
+
+
+
+
+
+
+    // VIDEO UPLOAD
+    function triggerUpload() { document.getElementById('videoFile').click(); }
+    function loadVideo(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const url = URL.createObjectURL(file);
+        const vp = document.getElementById('videoPlayer');
+        vp.src = url;
+        document.getElementById('playerContainer').style.display = 'block';
+        vp.play();
+      }
+    }
+</script>
+
+</body>
+</html><script></script><script type="module"></script></body></html><script></script><script type="module"></script></body></html>
