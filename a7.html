@@ -1,0 +1,449 @@
+<!DOCTYPE html><html><head><style></style></head><body><!DOCTYPE html>
+<html lang="ur">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum High-Precision Thermal Feels-Like Radar</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --studio-dark-bg: linear-gradient(135deg, rgba(10, 5, 3, 0.99) 0%, rgba(1, 0, 0, 1) 100%);
+            --text-glow: 0 2px 10px rgba(0, 0, 0, 0.9);
+            --thermal-cool: #00ffaa;     
+            --thermal-warm: #ffaa00;     
+            --thermal-heat: #ff3300;     
+        }
+
+        body {
+            background-color: #010103;
+            padding: 30px;
+            font-family: 'Poppins', sans-serif;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 95vh;
+            margin: 0;
+            overflow: hidden;
+        }
+
+        /* 🌤️ مین ماسٹر کنٹینر */
+        .quantum-thermal-widget {
+            width: 360px; 
+            background: var(--studio-dark-bg);
+            border-radius: 20px;
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            box-shadow: 0 40px 90px rgba(0,0,0,0.95), inset 0 0 30px rgba(255,255,255,0.02);
+            border-top: 1px solid rgba(255,255,255,0.08);
+            border-right: 1px solid rgba(255,255,255,0.03);
+            position: relative;
+            overflow: hidden;
+            border-left: 6px solid var(--thermal-cool); 
+            transition: border-color 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* 🌊 لائیو تھرمل پلس ویو (بیک گراؤنڈ اینیمیشن) */
+        .quantum-thermal-widget::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0, 255, 170, 0.03) 0%, transparent 60%);
+            animation: thermalWave 8s infinite linear;
+            pointer-events: none;
+            z-index: 1;
+            transition: background 0.8s ease;
+        }
+
+        .broadcast-meta-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding-bottom: 8px;
+            z-index: 2;
+        }
+        
+        .live-indicator {
+            color: #ff3300;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            animation: pulse-red 1s infinite;
+        }
+
+        .thermal-core-panel {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding-bottom: 12px;
+            z-index: 2;
+        }
+
+        .thermal-tracker-tag {
+            font-size: 9px;
+            font-weight: 900;
+            letter-spacing: 2.5px;
+            color: var(--thermal-cool);
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 8px;
+            transition: color 0.8s ease;
+        }
+
+        .radar-pulse-dot {
+            width: 7px;
+            height: 7px;
+            background-color: var(--thermal-cool);
+            border-radius: 50%;
+            box-shadow: 0 0 12px var(--thermal-cool);
+            animation: radarPulse 1.2s infinite;
+        }
+
+        .thermal-data-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .thermal-micro-area {
+            font-size: 26px;
+            font-weight: 900;
+            text-shadow: var(--text-glow);
+            line-height: 1.1;
+            letter-spacing: 0.5px;
+        }
+
+        .thermal-current-status {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--thermal-cool);
+            text-transform: uppercase;
+            margin-top: 6px;
+            transition: color 0.8s ease;
+        }
+
+        .thermal-number-display {
+            font-size: 52px;
+            font-weight: 900;
+            line-height: 1;
+            text-align: right;
+            transition: text-shadow 0.8s ease;
+        }
+
+        .thermal-label-sub {
+            font-size: 9px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.4);
+            display: block;
+            text-align: right;
+            letter-spacing: 1px;
+        }
+
+        /* 📊 موازنہ میٹرکس گرڈ (4 ہائی کوالٹی فیڈز) */
+        .thermal-stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            padding-bottom: 12px;
+            z-index: 2;
+        }
+
+        .thermal-stat-card {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .thermal-stat-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .thermal-stat-label {
+            font-size: 9px;
+            font-weight: 800;
+            color: rgba(255,255,255, 0.35);
+        }
+
+        .thermal-stat-val {
+            font-size: 14px;
+            font-weight: 900;
+        }
+
+        /* 🌡️ لائیو اردو ایڈوائزری */
+        .thermal-advisory-box {
+            background: rgba(255, 255, 255, 0.01);
+            border-radius: 10px;
+            padding: 12px;
+            border-left: 4px solid var(--thermal-cool);
+            font-size: 11.5px;
+            font-weight: 700;
+            line-height: 1.5;
+            color: rgba(255, 255, 255, 0.9);
+            direction: rtl;
+            transition: border-color 0.8s ease;
+            min-height: 36px;
+            z-index: 2;
+        }
+
+        .global-thermal-zone {
+            display: flex;
+            flex-direction: column;
+            z-index: 2;
+        }
+
+        .thermal-header-tag {
+            font-size: 9px;
+            font-weight: 900;
+            letter-spacing: 2px;
+            color: #ffcc00;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+
+        /* 🎬 الٹرا فلوڈ اینیمیشن کلاسز */
+        .fade-slide {
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+        .fade-out {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        .fade-in {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        @keyframes thermalWave {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes radarPulse {
+            0% { opacity: 0.3; transform: scale(0.9); }
+            50% { opacity: 1; transform: scale(1.15); }
+            100% { opacity: 0.3; transform: scale(0.9); }
+        }
+
+        @keyframes pulse-red {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quantum-thermal-widget" id="master-thermal-shell">
+        
+        <div class="broadcast-meta-header">
+            <div class="live-indicator">🔴 LIVE BROADCAST FEED</div>
+            <div id="live-broadcast-clock">00:00:00 AM</div>
+        </div>
+        
+        <div class="thermal-core-panel">
+            <div class="thermal-tracker-tag" id="thermal-tag-banner">
+                <div class="radar-pulse-dot" id="thermal-radar-dot"></div>
+                <span id="thermal-radar-title">RADAR ACTIVE</span>
+            </div>
+            
+            <div class="thermal-data-row fade-slide" id="main-data-row">
+                <div class="thermal-text-package">
+                    <span id="thermal-user-micro-location" class="thermal-micro-area">--</span>
+                    <span id="thermal-current-status" class="thermal-current-status">ANALYZING...</span>
+                </div>
+                <div>
+                    <div id="thermal-main-number" class="thermal-number-display">--</div>
+                    <span class="thermal-label-sub">FEELS LIKE</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="thermal-stats-grid fade-slide" id="stats-data-grid">
+            <div class="thermal-stat-card">
+                <div class="thermal-stat-meta">
+                    <span class="thermal-stat-label">حقیقی ٹمپریچر</span>
+                    <span id="val-actual-temp" class="thermal-stat-val">--</span>
+                </div>
+                <div style="font-size: 14px;">🌡️</div>
+            </div>
+            <div class="thermal-stat-card">
+                <div class="thermal-stat-meta">
+                    <span class="thermal-stat-label">ہوا میں نمی</span>
+                    <span id="val-thermal-humidity" class="thermal-stat-val">--</span>
+                </div>
+                <div style="font-size: 14px;">💧</div>
+            </div>
+            <div class="thermal-stat-card">
+                <div class="thermal-stat-meta">
+                    <span class="thermal-stat-label">ہوا کی رفتار</span>
+                    <span id="val-wind-speed" class="thermal-stat-val">--</span>
+                </div>
+                <div style="font-size: 14px;">💨</div>
+            </div>
+            <div class="thermal-stat-card">
+                <div class="thermal-stat-meta">
+                    <span class="thermal-stat-label">UV انڈیکس (شعاعیں)</span>
+                    <span id="val-uv-index" class="thermal-stat-val">--</span>
+                </div>
+                <div style="font-size: 14px;">☀️</div>
+            </div>
+        </div>
+
+        <div class="thermal-advisory-box fade-slide" id="thermal-health-advisory">
+            ٹیلی میٹری لنک منسلک ہو رہا ہے...
+        </div>
+
+        <div class="global-thermal-zone">
+            <div class="thermal-header-tag">🔥 NEXT BROADCAST STATION</div>
+            <div style="font-size: 11px; font-weight: 800; color: rgba(255,255,255,0.6);" id="next-station-tag">LOADING PLAYLIST...</div>
+        </div>
+
+    </div>
+
+    <script>
+        // 🌍 بڑے شہروں کی لائیو پلے لسٹ لوپ
+        const CityPlaylist = [
+            { name: "KARACHI", lat: 24.8607, lon: 67.0011 },
+            { name: "LAHORE", lat: 31.5204, lon: 74.3587 },
+            { name: "ISLAMABAD", lat: 33.6844, lon: 73.0479 },
+            { name: "MULTAN", lat: 30.1575, lon: 71.5249 },
+            { name: "DUBAI", lat: 25.2048, lon: 55.2708 },
+            { name: "MAKKAH", lat: 21.3891, lon: 39.8579 }
+        ];
+
+        let currentCityIndex = 0;
+
+        function updateBroadcastClock() {
+            const clockEl = document.getElementById("live-broadcast-clock");
+            const now = new Date();
+            clockEl.textContent = now.toLocaleTimeString('en-US', { hour12: true });
+        }
+        setInterval(updateBroadcastClock, 1000);
+
+        // 🛰️ اوپن میٹیو سے ہائی ٹیک الٹرا ڈیٹا فیچنگ (بشمول UV اور Wind)
+        async function fetchThermalDataForCity(cityObj) {
+            try {
+                const url = `https://api.open-meteo.com/v1/forecast?latitude=${cityObj.lat}&longitude=${cityObj.lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,wind_speed_10m,uv_index`;
+                const res = await fetch(url);
+                const data = await res.json();
+                
+                if (data && data.current) {
+                    const cur = data.current;
+                    const actual = Math.round(cur.temperature_2m);
+                    const humidity = Math.round(cur.relative_humidity_2m);
+                    const apparent = Math.round(cur.apparent_temperature);
+                    const wind = Math.round(cur.wind_speed_10m);
+                    const uv = Math.round(cur.uv_index);
+                    
+                    applyFadeEffect(true);
+
+                    setTimeout(() => {
+                        document.getElementById("thermal-user-micro-location").textContent = cityObj.name;
+                        document.getElementById("thermal-main-number").textContent = `${apparent}°C`;
+                        document.getElementById("val-actual-temp").textContent = `${actual}°C`;
+                        document.getElementById("val-thermal-humidity").textContent = `${humidity}%`;
+                        document.getElementById("val-wind-speed").textContent = `${wind} km/h`;
+                        document.getElementById("val-uv-index").textContent = `${uv} / 11`;
+
+                        applyDynamicThermalDesign(apparent);
+                        updateNextStationTag();
+                        applyFadeEffect(false);
+                    }, 400);
+                }
+            } catch (e) { 
+                console.log("Broadcast Link Error..."); 
+            }
+        }
+
+        function applyDynamicThermalDesign(apparent) {
+            const shell = document.getElementById("master-thermal-shell");
+            const banner = document.getElementById("thermal-tag-banner");
+            const dot = document.getElementById("thermal-radar-dot");
+            const statusText = document.getElementById("thermal-current-status");
+            const numberText = document.getElementById("thermal-main-number");
+            const advisory = document.getElementById("thermal-health-advisory");
+            
+            let color = "var(--thermal-cool)";
+            let status = "خوشگوار (COMFORTABLE)";
+            let msg = "محسوس ہونے والا درجہ حرارت بالکل نارمل اور آرام دہ ہے۔ بیرونی کاموں اور سفر کے لیے وقت بہترین ہے! 🍃";
+            let waveColor = "rgba(0, 255, 170, 0.03)";
+
+            if (apparent >= 32 && apparent <= 40) {
+                color = "var(--thermal-warm)";
+                status = "شدید تپش (MODERATE HEAT)";
+                msg = "ہوا میں نمی کے سبب حبس اور تپش زیادہ محسوس ہو رہی ہے۔ باہر نکلتے وقت پانی کا استعمال بڑھا دیں! ☀️";
+                waveColor = "rgba(255, 170, 0, 0.03)";
+            } else if (apparent > 40) {
+                color = "var(--thermal-heat)";
+                status = "شدید ترین گرمی (EXTREME HEAT)";
+                msg = "انتباہ! باہر لو اور شدید تپش کا ماحول ہے۔ بلا ضرورت دھوپ میں نکلنے سے گریز کریں اور ہیٹ اسٹروک سے بچیں! 🔥";
+                waveColor = "rgba(255, 51, 0, 0.04)";
+            }
+
+            shell.style.borderLeftColor = color;
+            shell.style.setProperty('--thermal-current-color', color);
+            banner.style.color = color;
+            dot.style.backgroundColor = color;
+            dot.style.boxShadow = `0 0 12px ${color}`;
+            statusText.style.color = color;
+            statusText.textContent = status;
+            numberText.style.textShadow = `0 0 20px ${color}`;
+            advisory.style.borderLeftColor = color;
+            advisory.textContent = msg;
+            
+            // ڈائنامک بیک گراؤنڈ لہر کا رنگ بدلنا
+            document.styleSheets[0].addRule('.quantum-thermal-widget::before', `background: radial-gradient(circle, ${waveColor} 0%, transparent 60%);`);
+        }
+
+        function updateNextStationTag() {
+            const nextIndex = (currentCityIndex + 1) % CityPlaylist.length;
+            document.getElementById("next-station-tag").textContent = `>> QUEUED FOR STREAM: ${CityPlaylist[nextIndex].name}`;
+        }
+
+        function applyFadeEffect(isOut) {
+            const targets = ['main-data-row', 'stats-data-grid', 'thermal-health-advisory'];
+            targets.forEach(id => {
+                const el = document.getElementById(id);
+                if(isOut) {
+                    el.classList.add('fade-out');
+                } else {
+                    el.classList.remove('fade-out');
+                    el.classList.add('fade-in');
+                    setTimeout(() => el.classList.remove('fade-in'), 50);
+                }
+            });
+        }
+
+        function rotateBroadcastStations() {
+            currentCityIndex = (currentCityIndex + 1) % CityPlaylist.length;
+            fetchThermalDataForCity(CityPlaylist[currentCityIndex]);
+        }
+
+        // ماسٹر سٹارٹ
+        updateBroadcastClock();
+        fetchThermalDataForCity(CityPlaylist[currentCityIndex]);
+
+        // پلے لسٹ روٹیشن ٹائمر (ہر 12 سیکنڈ بعد لائیو تبدیلی)
+        setInterval(rotateBroadcastStations, 12000);
+    </script>
+</body>
+</html><script></script><script type="module"></script></body></html>
